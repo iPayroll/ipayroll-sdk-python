@@ -24,6 +24,7 @@ class Page(IpayrollModel):
 
 class Resource(IpayrollModel):
     links = fields.Collection(Links)
+    id = fields.String()
 
 
 class Resources(IpayrollModel):
@@ -89,8 +90,8 @@ class Employee(Resource):
     isIncomeLessThanRelevantAmount = fields.Boolean()
     isPayrollTaxExempt = fields.Boolean()
     isSfssDebt = fields.Boolean()
-    getDependentChildren = fields.Integer()
-    getSurchargeIncrease = fields.Float()
+    dependentChildren = fields.Integer()
+    surchargeIncrease = fields.Float()
     preferredName = fields.String()
     proprietorStatus = fields.String()
     contractorsAbn = fields.String()
@@ -200,6 +201,7 @@ class PayElement(Resource):
     payeeReference = fields.String()
     payeeCode = fields.String()
     bankAccountNumber = fields.String()
+    bsbAccountNumber = fields.String()
     reduceSuperable = fields.Boolean()
     priority = fields.Integer()
     leaveBalanceType = fields.Embedded(LeaveBalanceType)
@@ -216,7 +218,6 @@ class PayElement(Resource):
     paymentGroup = fields.String()
     rules = fields.Collection(LeaveEntitlementRule)
     derivedFrom = fields.String()
-    bsbAccountNumber = fields.String()
     calculationAccumulator = fields.String()
     debitCostCentreRule = fields.String()
     rates = fields.Collection(PayElementRate)
@@ -259,6 +260,7 @@ class PayslipTransaction(Resource):
     quantity = fields.Float()
     amount = fields.Float()
     notes = fields.String()
+    displayQuantity = fields.String()
 
 
 class TimesheetTransaction(Resource):
@@ -266,13 +268,13 @@ class TimesheetTransaction(Resource):
     amount = fields.Float()
     quantity = fields.Float()
     rate = fields.Float()
-    payElement = fields.String()
     description = fields.String()
     costCentre = fields.String()
     reason = fields.String()
     leaveFrom = fields.String()
     leaveTo = fields.String()
     leaveDays = fields.String()
+    payElement = fields.String()
 
 
 class Timesheet(Resource):
