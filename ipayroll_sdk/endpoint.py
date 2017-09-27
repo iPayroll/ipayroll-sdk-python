@@ -213,31 +213,3 @@ class TimesheetsEndpoint(Endpoint):
 
     def create(self, timecardEntries):
         self._create(timecardEntries)
-
-# class TimecardEntriesEndpoint(Endpoint):
-#     _url = '/api/v1/timecard/entry'
-#     _resources = TimecardEntries
-#     _resource = TimecardEntry
-#
-#     def list(self, page=PageParams.DEFAULT_PAGE, size=PageParams.DEFAULT_SIZE):
-#         return self._list(page, size)
-#
-#     def get(self, id):
-#         return self._get(id)
-#
-#     def delete(self, id):
-#         self._delete(id)
-#
-#     def create(self, timecardEntry):
-#         self._create(timecardEntry)
-#
-#     def update(self, timecardEntry):
-#         self._update(timecardEntry.id, timecardEntry)
-#
-#
-# class TimecardSettingsEndpoint(Endpoint):
-#     _url = '/api/v1/timecard/entry'
-#     _resource = TimecardSetting
-#
-#     def get(self, orgNumber):
-#         return self._requester.get(self._url, params={'orgNumber': orgNumber}).as_resource(self._resource)

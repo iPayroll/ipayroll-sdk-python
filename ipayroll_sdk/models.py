@@ -308,58 +308,6 @@ class YearToDateTotalsEntry(Resource):
     yearToDateTotals = fields.Integer()
 
 
-# class TimecardActivity(Resource):
-#     id = fields.Integer()
-#     code = fields.String()
-#     type = fields.String()
-#
-#
-# class TimecardEmployee(Resource):
-#     id = fields.String()
-#     name = fields.String()
-#     isInactive = fields.Boolean()
-#
-#
-# class TimecardEntry(Resource):
-#     id = fields.Integer()
-#     date = fields.String()
-#     startTime = fields.String()
-#     endTime = fields.String()
-#     status = fields.String()
-#     hours = fields.Float()
-#     version = fields.Integer()
-#     linkedResourceId = fields.Integer()  # Long
-#     isCreatedByKiosk = fields.Boolean()  # Long
-#     kioskNote = fields.String()
-#     approverNote = fields.String()
-#     breakMinutes = fields.Float()
-#     hoursWorked = fields.Float()
-#     isOnlyLeaveRequests = fields.Boolean()
-#     employee = fields.Embedded(TimecardEmployee)
-#     createdBy = fields.Embedded(TimecardEmployee)
-#     activity = fields.Embedded(TimecardActivity)
-#
-#
-# class TimecardLog(Resource):
-#     employee = fields.Embedded(TimecardEmployee)
-#     date = fields.String()
-#     standardHours = fields.Float()
-#     ordinaryHours = fields.Float()
-#     additionalHours = fields.Float()
-#     status = fields.String()
-#     # Map<Long, Integer> getEntryIds();
-#     timeCode = fields.String()
-#     isLeavePendingExists = fields.Boolean()
-#     isOnlyLeaveRequestss = fields.Boolean()
-#     isOnlyNonActionableEntriess = fields.Boolean()
-#
-#
-# class TimecardSetting(Resource):
-#     isActivityEnabled = fields.Boolean()
-#     isTimesEnabled = fields.Boolean()
-#     isLeaveRequestsOnlineEnabled = fields.Boolean()
-
-
 class CostCentres(Resources):
     content = fields.Collection(CostCentre)
 
