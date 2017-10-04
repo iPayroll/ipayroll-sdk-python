@@ -3,8 +3,8 @@ from ipayroll_sdk.parameter import PageParams
 
 
 class Oauth2Endpoint(object):
-    def __init__(self):
-        self.__session
+    # def __init__(self):
+    #     self.__session
 
     @staticmethod
     def __allow_http_request():
@@ -32,22 +32,25 @@ class Endpoint(object):
     def __init__(self, requester):
         self._requester = requester
 
-    def _list(self, page, size):
-        pageParams = PageParams(page=page, size=size)
-        response = self._requester.get(self._url, params=pageParams.__dict__)
+    def _list(self, page, size, path=None, params={}):
+        page_params = PageParams(page=page, size=size)
+        params.update(page_params.__dict__)
+        if path is None:
+            path = self._url
+        response = self._requester.get(path, params=params)
         return response.as_resource(self._resources)
 
     def _get(self, id):
-        return self._requester.get(self._url + '/' + id).as_resource(self._resource)
+        return self._requester.get(self._url + '/' + str(id)).as_resource(self._resource)
 
     def _create(self, value):
         return self._requester.post(self._url, value).as_resources(self._resource)
 
     def _update(self, id, value):
-        return self._requester.post(self._url + '/' + id, value).as_resource(self._resource)
+        return self._requester.post(self._url + '/' + str(id), value).as_resource(self._resource)
 
     def _delete(self, id):
-        return self._requester.delete(self._url + '/' + id)
+        return self._requester.delete(self._url + '/' + str(id))
 
 
 class CostCentersEndpoint(Endpoint):
@@ -61,8 +64,8 @@ class CostCentersEndpoint(Endpoint):
     def get(self, id):
         return self._get(id)
 
-    def create(self, costCentre):
-        return self._create(costCentre)
+    def create(self, cost_centre):
+        return self._create(cost_centre)
 
 
 class EmployeesEndpoint(Endpoint):
@@ -91,18 +94,10 @@ class EmployeeCustomFieldEndpoint(Endpoint):
         super(EmployeeCustomFieldEndpoint, self).__init__(requester)
 
     def list(self, category=None, page=PageParams.DEFAULT_PAGE, size=PageParams.DEFAULT_SIZE):
-        if not category:
-            return self._list(page, size)
-        else:
-            return self._list_category(category, page)
+        return self._list(page, size, {'category': category})
 
-    def _list_category(self, category, page, size):
-        pageParams = PageParams(page=page, size=size)
-        response = self._requester.get(self._url + '/' + category, params=pageParams.__dict__)
-        return response.as_resource(self._resources)
-
-    def get(self, category, id):
-        return self._requester.get(self._url + '/' + category + '/' + id).as_resource(self._resource)
+    def get(self, id):
+        return self._get(id)
 
 
 class EmployeesLeaveBalancesEndpoint(Endpoint):
@@ -129,8 +124,12 @@ class EmployeesLeaveRequestsEndpoint(Endpoint):
     def list(self, page=PageParams.DEFAULT_PAGE, size=PageParams.DEFAULT_SIZE):
         return self._list(page, size)
 
-    def getOutstanding(self):
-        return self._get('current')
+    def list_outstanding(self, page=PageParams.DEFAULT_PAGE, size=PageParams.DEFAULT_SIZE):
+        url_outstanding = self._url + '/current'
+        return self._list(page, size, path=url_outstanding)
+
+    def get(self, id):
+        return self._get(id)
 
 
 class EmployeesPayRatesEndpoint(Endpoint):
@@ -147,12 +146,6 @@ class EmployeesPayRatesEndpoint(Endpoint):
         return self._get(code)
 
 
-# class LeaveBalanceEndpoint
-
-# class EmployeesPayslipsEndpoint(Endpoint):
-#     pass
-
-
 class LeaveRequestsEndpoint(Endpoint):
     _url = '/api/v1/leaves/requests'
     _resources = LeaveRequests
@@ -161,11 +154,12 @@ class LeaveRequestsEndpoint(Endpoint):
     def list(self, page=PageParams.DEFAULT_PAGE, size=PageParams.DEFAULT_SIZE):
         return self._list(page, size)
 
+    def list_outstanding(self, page=PageParams.DEFAULT_PAGE, size=PageParams.DEFAULT_SIZE):
+        url_outstanding = self._url + '/current'
+        return self._list(page, size, path=url_outstanding)
+
     def get(self, id):
         return self._get(id)
-
-    def getOutstanding(self):
-        return self._get('current')
 
 
 class PayElementsEndpoint(Endpoint):
@@ -211,5 +205,5 @@ class TimesheetsEndpoint(Endpoint):
         "/{employeeId}/transactions/{timesheetTransactionId}"
         self._delete(id)
 
-    def create(self, timecardEntries):
-        self._create(timecardEntries)
+    def create(self, timesheets):
+        self._create(timesheets)

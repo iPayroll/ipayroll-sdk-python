@@ -287,6 +287,11 @@ class Timesheet(Resource):
     transactions = fields.Collection(TimesheetTransaction)
 
 
+class YearToDateTotalsEntry(Resource):
+    key = fields.String()
+    yearToDateTotals = fields.Integer()
+
+
 class Payslip(Resource):
     totalPayments = fields.Float()
     overpayment = fields.Float()
@@ -301,11 +306,6 @@ class Payslip(Resource):
     timesheet = fields.Embedded(Timesheet)
     payments = fields.Collection(PayslipTransaction)
     payroll = fields.Embedded(PayslipPayroll)
-
-
-class YearToDateTotalsEntry(Resource):
-    key = fields.String()
-    yearToDateTotals = fields.Integer()
 
 
 class CostCentres(Resources):
@@ -338,10 +338,6 @@ class LeaveRequests(Resources):
 
 class Payslips(Resources):
     content = fields.Collection(Payslip)
-
-
-# class TimecardEntries(Resources):
-#     content = fields.Collection(TimecardEntry)
 
 
 class Timesheets(Resources):

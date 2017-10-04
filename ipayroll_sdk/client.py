@@ -13,7 +13,8 @@ class Client(object):
 
     def __init__(self, client_id, client_secret, redirect_uri, scope=SCOPE_DEFAULT,
                  base_url=API_BASE_URL_DEFAULT, authorization_uri=AUTHORIZATION_URI_DEFAULT,
-                 token_credential_uri=TOKEN_CREDENTIAL_URI_DEFAULT, refresh_token_uri=REFRESH_TOKEN_URI_DEFAULT, token_updater=None):
+                 token_credential_uri=TOKEN_CREDENTIAL_URI_DEFAULT, refresh_token_uri=REFRESH_TOKEN_URI_DEFAULT,
+                 token_updater=None):
         if token_updater is None:
             token_updater = self.token_updater
 
@@ -27,7 +28,7 @@ class Client(object):
     def oauth2(self):
         return self.__session
 
-    def costcentres(self):
+    def cost_centres(self):
         return CostCentersEndpoint(self.__session.requester())
 
     def employees(self):
@@ -37,7 +38,7 @@ class Client(object):
         return EmployeeCustomFieldEndpoint(self.__session.requester(), employee_id)
 
     def employees_payrates(self, employee_id):
-        return EmployeesPayratesEndpoint(self.__session.requester(), employee_id)
+        return EmployeesPayRatesEndpoint(self.__session.requester(), employee_id)
 
     def employees_leave_balance(self, employee_id):
         return EmployeesLeaveBalancesEndpoint(self.__session.requester(), employee_id)
@@ -54,9 +55,5 @@ class Client(object):
     def pay_elements(self):
         return PayElementsEndpoint(self.__session.requester())
 
-    # def payslips(self):
-    #     return PayslipsEndpoint(self.__session.requester())
-
-
-    def timecard_entries(self):
-        return TimecardEntriesEndpoint(self.__session.requester())
+        # def payslips(self):
+        #     return PayslipsEndpoint(self.__session.requester())
