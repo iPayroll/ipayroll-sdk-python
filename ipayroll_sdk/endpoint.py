@@ -3,25 +3,39 @@ from ipayroll_sdk.parameter import PageParams
 
 
 class Oauth2Endpoint(object):
-    # def __init__(self):
-    #     self.__session
 
-    @staticmethod
-    def __allow_http_request():
-        import os
-        os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    def __init__(self, oauth2_session, ):
+        self.__oauth2_session = oauth2_session
 
     def get_authorization_url(self):
-        authorization_url, self.__state = self.session.authorization_url(
-            self.__authorization_uri)
+        authorization_url, self.__oauth2_session.__state = self.__oauth2_session.authorization_url(
+            self.__oauth2_session.get_authorization_uri())
         return authorization_url
 
     def exchange_authorization_code_for_access_token(self, code):
-        token = self.fetch_token(
-            self.__token_credential_uri,
+        token = self.__oauth2_session.fetch_token(
+            self.__oauth2_session.get_token_credential_uri(),
             code=code,
-            client_secret=self.__client_secret)
-        return token
+            client_secret=self.__oauth2_session.get_client_secret())
+        return self.__update_token(token);
+
+    def refresh_access_token(self, refresh_token=None):
+        token = self.__oauth2_session.refresh_token(self.__oauth2_session.get_token_credential_uri(),
+                                                    refresh_token=refresh_token)
+        return self.__update_token(token);
+
+    def connect_with_refresh_token(self, refresh_token):
+        return self.refresh_access_token(refresh_token);
+
+    def connect_with_access_token(self, oauth2_access_token):
+        return self.refresh_access_token(oauth2_access_token.refresh_token);
+
+    def __update_token(self, token):
+        access_token = OAuth2Token()
+        access_token.update(token)
+        if self.__oauth2_session.token_updater:
+            self.__oauth2_session.token_updater(token)
+        return access_token
 
 
 class Endpoint(object):
@@ -32,7 +46,7 @@ class Endpoint(object):
     def __init__(self, requester):
         self._requester = requester
 
-    def _list(self, page, size, path=None, params={}):
+    def _list(self, page, size, params={}, path=None):
         page_params = PageParams(page=page, size=size)
         params.update(page_params.__dict__)
         if path is None:
@@ -174,10 +188,12 @@ class PayElementsEndpoint(Endpoint):
         return self._get(id)
 
 
-class PayslipsEndpoint(Endpoint):
-    _url = '/api/v1/payslips'
-    _resource = Payslip
-    _resources = Payslips
+class PayrollPayslipsEndpoint(Endpoint):
+    def __init__(self, requester, payroll_id):
+        self._url = '/api/v1/payrolls/%s/payslips' % payroll_id
+        self._resource = Payslip
+        self._resources = Payslips
+        super(PayrollPayslipsEndpoint, self).__init__(requester)
 
     def list(self, page=PageParams.DEFAULT_PAGE, size=PageParams.DEFAULT_SIZE):
         return self._list(page, size)

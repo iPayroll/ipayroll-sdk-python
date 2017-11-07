@@ -9,6 +9,14 @@ class IpayrollModel(Model):
             self.other[k] = v
         setattr(self, k, v)
 
+class OAuth2Token(Model):
+    token_type = fields.String()
+    refresh_token = fields.String()
+    access_token = fields.String()
+    scope = fields.String()
+    expires_in = fields.Integer()
+    expires_at = fields.Float()
+
 
 class Links(IpayrollModel):
     href = fields.String()

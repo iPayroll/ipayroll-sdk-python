@@ -1,18 +1,20 @@
 from requests_oauthlib import OAuth2Session
 from ipayroll_sdk.error import IpayrollRequestError, Error
+from ipayroll_sdk.models import OAuth2Token
 
 
 class OAuth2Session(OAuth2Session):
     def __init__(self, client_id, client_secret, redirect_uri, scope, base_url, authorization_uri,
-                 token_credential_uri, auto_refresh_url, token_updater):
+                 token_credential_uri, auto_refresh_url, access_token_updater):
         extra = {
             'client_id': client_id,
             'client_secret': client_secret,
         }
         super(OAuth2Session, self).__init__(client_id=client_id, redirect_uri=redirect_uri, scope=scope,
                                             auto_refresh_url=base_url + auto_refresh_url, auto_refresh_kwargs=extra,
-                                            token_updater=token_updater)
+                                            token_updater=self.token_updater)
 
+        self.access_token_updater = access_token_updater
         self.__client_secret = client_secret
         self.base_url = base_url
         self.__authorization_uri = base_url + authorization_uri
@@ -25,23 +27,21 @@ class OAuth2Session(OAuth2Session):
         import os
         os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
-    def get_authorization_url(self):
-        authorization_url, self.__state = self.authorization_url(
-            self.__authorization_uri)
-        return authorization_url
+    def token_updater(self, token):
+        if self.access_token_updater is not None:
+            self.access_token_updater(token)
 
-    def exchange_authorization_code_for_access_token(self, code):
-        token = self.fetch_token(
-            self.__token_credential_uri,
-            code=code,
-            client_secret=self.__client_secret)
-        return token
+    def with_token(self, token):
+        self.token()
 
-    def refresh_access_token(self):
-        return self.refresh_token(self.__token_credential_uri)
+    def get_authorization_uri(self):
+        return self.__authorization_uri;
 
-    def requester(self):
-        return Requester(self)
+    def get_token_credential_uri(self):
+        return self.__token_credential_uri;
+
+    def get_client_secret(self):
+        return self.__client_secret;
 
 
 class Requester(object):

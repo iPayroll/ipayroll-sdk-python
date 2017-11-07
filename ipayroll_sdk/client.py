@@ -1,4 +1,4 @@
-from ipayroll_sdk.http import OAuth2Session
+from ipayroll_sdk.http import OAuth2Session, Requester
 from ipayroll_sdk.endpoint import *
 
 
@@ -14,46 +14,41 @@ class Client(object):
     def __init__(self, client_id, client_secret, redirect_uri, scope=SCOPE_DEFAULT,
                  base_url=API_BASE_URL_DEFAULT, authorization_uri=AUTHORIZATION_URI_DEFAULT,
                  token_credential_uri=TOKEN_CREDENTIAL_URI_DEFAULT, refresh_token_uri=REFRESH_TOKEN_URI_DEFAULT,
-                 token_updater=None):
-        if token_updater is None:
-            token_updater = self.token_updater
-
+                 access_token_updater=None):
         self.__base_url = base_url
         self.__session = OAuth2Session(client_id, client_secret, redirect_uri, scope, base_url,
-                                       authorization_uri, token_credential_uri, refresh_token_uri, token_updater)
+                                       authorization_uri, token_credential_uri, refresh_token_uri, access_token_updater)
 
-    def token_updater(self, token):
-        pass
 
     def oauth2(self):
-        return self.__session
+        return Oauth2Endpoint(self.__session)
 
     def cost_centres(self):
-        return CostCentersEndpoint(self.__session.requester())
+        return CostCentersEndpoint(self.requester())
 
     def employees(self):
-        return EmployeesEndpoint(self.__session.requester())
+        return EmployeesEndpoint(self.requester())
 
     def employees_custom_field(self, employee_id):
-        return EmployeeCustomFieldEndpoint(self.__session.requester(), employee_id)
+        return EmployeeCustomFieldEndpoint(self.requester(), employee_id)
 
     def employees_payrates(self, employee_id):
-        return EmployeesPayRatesEndpoint(self.__session.requester(), employee_id)
+        return EmployeesPayRatesEndpoint(self.requester(), employee_id)
 
     def employees_leave_balance(self, employee_id):
-        return EmployeesLeaveBalancesEndpoint(self.__session.requester(), employee_id)
+        return EmployeesLeaveBalancesEndpoint(self.requester(), employee_id)
 
     def employees_leave_requests(self, employee_id):
-        return EmployeesLeaveRequestsEndpoint(self.__session.requester(), employee_id)
+        return EmployeesLeaveRequestsEndpoint(self.requester(), employee_id)
 
     # def employeesPayslips(self, employee_id):
-    #     return EmployeesPayslipsEndpoint(self.__session.requester(), employee_id)
+    #     return EmployeesPayslipsEndpoint(self.requester(), employee_id)
 
     def leave_requests(self):
-        return LeaveRequestsEndpoint(self.__session.requester())
+        return LeaveRequestsEndpoint(self.requester())
 
     def pay_elements(self):
-        return PayElementsEndpoint(self.__session.requester())
+        return PayElementsEndpoint(self.requester())
 
-        # def payslips(self):
-        #     return PayslipsEndpoint(self.__session.requester())
+    def requester(self):
+        return Requester(self.__session)
