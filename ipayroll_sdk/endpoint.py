@@ -57,6 +57,9 @@ class Endpoint(object):
     def _get(self, id):
         return self._requester.get(self._url + '/' + str(id)).as_resource(self._resource)
 
+    def _get_url(self, url):
+        return self._requester.get(url).as_resource(self._resource)
+
     def _create(self, value):
         return self._requester.post(self._url, value).as_resources(self._resource)
 
@@ -100,12 +103,12 @@ class EmployeesEndpoint(Endpoint):
         return self._update(employee.employeeId, employee)
 
 
-class EmployeeCustomFieldEndpoint(Endpoint):
+class EmployeeCustomFieldsEndpoint(Endpoint):
     def __init__(self, requester, employee_id):
         self._url = '/api/v1/employees/%s/customfields' % (employee_id)
         self._resource = EmployeeCustomField
         self._resources = EmployeeCustomFields
-        super(EmployeeCustomFieldEndpoint, self).__init__(requester)
+        super(EmployeeCustomFieldsEndpoint, self).__init__(requester)
 
     def list(self, category=None, page=PageParams.DEFAULT_PAGE, size=PageParams.DEFAULT_SIZE):
         return self._list(page, size, {'category': category})
@@ -113,13 +116,20 @@ class EmployeeCustomFieldEndpoint(Endpoint):
     def get(self, id):
         return self._get(id)
 
+    def list_by_category(self, category, page=PageParams.DEFAULT_PAGE, size=PageParams.DEFAULT_SIZE):
+        return self.list(category, page, size)
 
-class EmployeesLeaveBalancesEndpoint(Endpoint):
+    def get_by_category_and_id(self, category, id):
+        url = "%s/%s/%s" % (self._url, category, id);
+        return self._get_url(url)
+
+
+class EmployeeLeaveBalancesEndpoint(Endpoint):
     def __init__(self, requester, employee_id):
         self._url = '/api/v1/employees/%s/leaves/balances' % (employee_id)
         self._resource = LeaveBalance
         self._resources = LeaveBalances
-        super(EmployeesLeaveBalancesEndpoint, self).__init__(requester)
+        super(EmployeeLeaveBalancesEndpoint, self).__init__(requester)
 
     def list(self, page=PageParams.DEFAULT_PAGE, size=PageParams.DEFAULT_SIZE):
         return self._list(page, size)
@@ -128,12 +138,12 @@ class EmployeesLeaveBalancesEndpoint(Endpoint):
         return self._get(id)
 
 
-class EmployeesLeaveRequestsEndpoint(Endpoint):
+class EmployeeLeaveRequestsEndpoint(Endpoint):
     def __init__(self, requester, employee_id):
         self._url = '/api/v1/employees/%s/leaves/requests' % employee_id
         self._resource = LeaveRequest
         self._resources = LeaveRequests
-        super(EmployeesLeaveRequestsEndpoint, self).__init__(requester)
+        super(EmployeeLeaveRequestsEndpoint, self).__init__(requester)
 
     def list(self, page=PageParams.DEFAULT_PAGE, size=PageParams.DEFAULT_SIZE):
         return self._list(page, size)
@@ -175,9 +185,15 @@ class LeaveRequestsEndpoint(Endpoint):
     def get(self, id):
         return self._get(id)
 
+    def create(self, employee):
+        return self._create(employee)
+
+    def update(self, employee):
+        return self._update(employee.employeeId, employee)
+
 
 class PayElementsEndpoint(Endpoint):
-    _url = '/api/v1/leaves/payelements'
+    _url = '/api/v1/payelements'
     _resources = PayElements
     _resource = PayElement
 
@@ -188,18 +204,52 @@ class PayElementsEndpoint(Endpoint):
         return self._get(id)
 
 
-class PayrollPayslipsEndpoint(Endpoint):
-    def __init__(self, requester, payroll_id):
-        self._url = '/api/v1/payrolls/%s/payslips' % payroll_id
-        self._resource = Payslip
-        self._resources = Payslips
-        super(PayrollPayslipsEndpoint, self).__init__(requester)
+class PayrollsEndpoint(Endpoint):
+    _url = '/api/v1/payrolls'
+    _resources = Payrolls
+    _resource = Payroll
 
     def list(self, page=PageParams.DEFAULT_PAGE, size=PageParams.DEFAULT_SIZE):
         return self._list(page, size)
 
     def get(self, id):
         return self._get(id)
+
+    def get_current(self):
+        return self.get('current')
+
+
+class PayslipsEndpoint(Endpoint):
+    def __init__(self, requester):
+        self._url = '/api/v1/payslips'
+        self._resource = Payslip
+        self._resources = Payslips
+        super(PayslipsEndpoint, self).__init__(requester)
+
+    def list(self, page=PageParams.DEFAULT_PAGE, size=PageParams.DEFAULT_SIZE):
+        return self._list(page, size)
+
+    def list_by_payroll(self, payroll_id, page=PageParams.DEFAULT_PAGE, size=PageParams.DEFAULT_SIZE):
+        url = "%s/%s" % (self._url, payroll_id)
+        return self._list(page, size, {}, url)
+
+    def get_by_employee_id(self, employee_id):
+        url = "%s/employees/%s" % (self._url, employee_id)
+        return self._get_url(url)
+
+    def get_by_payroll_and_by_employee_id(self, payroll_id, employee_id):
+        url = "%s/%s/employees/%s" % (self._url, payroll_id, employee_id)
+        return self._get_url(url)
+
+
+class TimesheetTransactionsEndpoint(Endpoint):
+    def __init__(self, requester, timesheet_id):
+        self._url = "/api/v1/timesheets/%s/transactions" % timesheet_id
+        self._resource = TimesheetTransaction
+        super(TimesheetTransactionsEndpoint, self).__init__(requester)
+
+    def delete(self, id):
+        return self._delete(id)
 
 
 class TimesheetsEndpoint(Endpoint):
@@ -213,13 +263,15 @@ class TimesheetsEndpoint(Endpoint):
     def get(self, id):
         return self._get(id)
 
-    def get_by_payroll_number(self, id):
-        "/{employeeId}/payrolls/{payrollNumber}"
-        return self._get(id)
-
-    def delete_timesheet_transaction(self, id):
-        "/{employeeId}/transactions/{timesheetTransactionId}"
-        self._delete(id)
-
     def create(self, timesheets):
-        self._create(timesheets)
+        return self._create(timesheets)
+
+    def get_by_payroll_id(self, timesheet_id, payroll_id):
+        url = "%s/payrolls/%s" % (self._url, timesheet_id, payroll_id)
+        return self._get_url(url)
+
+    def transactions(self, timesheet_id):
+        TimesheetTransactionsEndpoint(self._requester, timesheet_id);
+
+    def delete_transaction(self, timesheet_id, id):
+        return self.transactions(timesheet_id).delete(id)

@@ -9,7 +9,8 @@ class IpayrollModel(Model):
             self.other[k] = v
         setattr(self, k, v)
 
-class OAuth2Token(Model):
+
+class OAuth2Token(IpayrollModel):
     token_type = fields.String()
     refresh_token = fields.String()
     access_token = fields.String()
@@ -41,7 +42,6 @@ class Resources(IpayrollModel):
 
 
 class CostCentre(Resource):
-    costCentreId = fields.Integer()
     code = fields.String()
     description = fields.String()
     displayValue = fields.String()
@@ -52,17 +52,16 @@ class Address(Resource):
     addressLine2 = fields.String()
     suburb = fields.String()
     city = fields.String()
+    state = fields.String()
     postCode = fields.String()
     country = fields.String()
 
 
 class Employee(Resource):
-    employeeId = fields.String()
     surname = fields.String()
     firstNames = fields.String()
     startDate = fields.String()
     birthDate = fields.String()
-    paidToTate = fields.String()
     defaultCostCentre = fields.String()
     email = fields.String()
     phone = fields.String()
@@ -72,6 +71,7 @@ class Employee(Resource):
     payFrequency = fields.String()
     fullTimeHoursWeek = fields.Float()
     organisation = fields.Integer()
+    paidToDate = fields.String()
     paymentMethod = fields.String()
     bankAccountNumber = fields.String()
     taxNumber = fields.String()
@@ -89,15 +89,15 @@ class Employee(Resource):
     esctRate = fields.Float()
     specialTax = fields.Float()
     specialEarnerLevy = fields.Float()
-    specialExtraPayRate = fields.String()
+    specialExtraPayRate = fields.Float()
     specialStudentLoan = fields.Float()
     userDefinedGroup = fields.String()
-    isHelpDebt = fields.Boolean()
-    isMedicareLevyVariationDeclaration = fields.Boolean()
-    isHasSpouse = fields.Boolean()
-    isIncomeLessThanRelevantAmount = fields.Boolean()
-    isPayrollTaxExempt = fields.Boolean()
-    isSfssDebt = fields.Boolean()
+    helpDebt = fields.Boolean()
+    medicareLevyVariationDeclaration = fields.Boolean()
+    hasSpouse = fields.Boolean()
+    incomeLessThanRelevantAmount = fields.Boolean()
+    payrollTaxExempt = fields.Boolean()
+    sfssDebt = fields.Boolean()
     dependentChildren = fields.Integer()
     surchargeIncrease = fields.Float()
     preferredName = fields.String()
@@ -107,11 +107,10 @@ class Employee(Resource):
 
 
 class EmployeeCustomField(Resource):
-    # EmployeeResource
     category = fields.Integer()
     categoryName = fields.String()
     customFieldId = fields.Integer()
-    name = fields.String
+    name = fields.String()
     date = fields.String()
     description = fields.String()
     contact = fields.String()
@@ -145,6 +144,8 @@ class LeaveBalance(Resource):
     accrued = fields.Float()
     taken = fields.Float()
     balance = fields.Float()
+    nextAnniversaryDate = fields.String()
+    lastAnniversaryDate = fields.String()
     leaveBalanceType = fields.Embedded(LeaveBalanceType)
 
 
@@ -169,18 +170,19 @@ class LeaveRequest(Resource):
     reason = fields.String()
     status = fields.String()
     payElement = fields.String()
-
+    payElementId = fields.Integer()
     leaveBalanceType = fields.Embedded(LeaveBalanceType)
 
 
 class PayElementRate(Resource):
     reportingGroupName = fields.String()
     description = fields.String()
-    rate = fields.Float()
-    years = fields.Float()
     taxablePayPerWeek = fields.Float()
+    weeklyRate = fields.Float()
     hoursPerWeek = fields.Float()
+    rate = fields.Float()
     multiplier = fields.Float()
+    years = fields.Float()
 
 
 class PayElement(Resource):
@@ -202,7 +204,7 @@ class PayElement(Resource):
     lslLiable = fields.Boolean()
     casLiable = fields.Boolean()
     reducing = fields.Boolean()
-    rayableOnFinalPay = fields.Boolean()
+    payableOnFinalPay = fields.Boolean()
     itemisedOnPaymentSummary = fields.Boolean()
     allowPartialDeduction = fields.Boolean()
     consolidateTransactions = fields.Boolean()
@@ -212,7 +214,6 @@ class PayElement(Resource):
     bsbAccountNumber = fields.String()
     reduceSuperable = fields.Boolean()
     priority = fields.Integer()
-    leaveBalanceType = fields.Embedded(LeaveBalanceType)
     costCentresRule = fields.String()
     paymentMethod = fields.String()
     payeeParticulars = fields.String()
@@ -224,13 +225,14 @@ class PayElement(Resource):
     availableForLeaveRequest = fields.Boolean()
     leaveTaxType = fields.String()
     paymentGroup = fields.String()
-    rules = fields.Collection(LeaveEntitlementRule)
-    derivedFrom = fields.String()
     calculationAccumulator = fields.String()
     debitCostCentreRule = fields.String()
-    rates = fields.Collection(PayElementRate)
     excessRedundancy = fields.String()
+    derivedFrom = fields.String()
     customField = fields.String()
+    rules = fields.Collection(LeaveEntitlementRule)
+    rates = fields.Collection(PayElementRate)
+    leaveBalanceType = fields.Embedded(LeaveBalanceType)
 
 
 class PayRate(Resource):
@@ -240,6 +242,21 @@ class PayRate(Resource):
     code = fields.String()
     divisor = fields.String()
     payScaleCode = fields.String()
+
+
+class PayrollPayFrequency(IpayrollModel):
+    payFrequency = fields.String()
+    paidToDate = fields.String()
+    included = fields.Boolean()
+
+
+class Payroll(Resource):
+    payrollNumber = fields.String()
+    payDate = fields.String()
+    message = fields.String()
+    status = fields.String()
+    payrollType = fields.String()
+    payFrequencies = fields.Embedded(PayrollPayFrequency)
 
 
 class PayslipLeaveBalance(Resource):
@@ -261,6 +278,7 @@ class PayslipPayrollEmployeeTransaction(Resource):
     charity = fields.String()
     description = fields.String()
     notes = fields.String()
+    displayPayslipQuantity = fields.String()
 
 
 class PayslipTransaction(Resource):
@@ -342,6 +360,10 @@ class LeaveBalances(Resources):
 
 class LeaveRequests(Resources):
     content = fields.Collection(LeaveRequest)
+
+
+class Payrolls(Resources):
+    content = fields.Collection(Payroll)
 
 
 class Payslips(Resources):
