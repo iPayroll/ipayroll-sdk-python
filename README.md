@@ -117,6 +117,7 @@ client.payslips_by_current_payroll()
 client.payslips_by_payroll()
 client.timesheets()
 client.timesheetsTransactions($timesheets_id)
+client.timesheets_by_payroll($payroll_id)
 client.payrolls()
 
 

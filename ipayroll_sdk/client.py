@@ -52,11 +52,17 @@ class Client(object):
     def payslips_by_current_payroll(self):
         return self.payslips_by_payroll('current');
 
-    def payslips_by_payroll(self, payslipId):
-        return PayrollPayslipsEndpoint(self.requester(), payslipId)
+    def payslips_by_payroll(self, payroll_id):
+        return PayrollPayslipsEndpoint(self.requester(), payroll_id)
 
     def timesheets(self):
         return TimesheetsEndpoint(self.requester())
+
+    def timesheets_by_payroll(self, payroll_id):
+        return PayrollTimesheetsEndpoint(self.requester(), payroll_id)
+
+    def timesheets_by_current_payroll(self):
+        return self.timesheets();
 
     def timesheets_transactions(self):
         return TimesheetTransactionsEndpoint(self.requester())

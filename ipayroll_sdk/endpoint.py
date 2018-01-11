@@ -243,6 +243,20 @@ class TimesheetTransactionsEndpoint(Endpoint):
         return self._delete(id)
 
 
+class PayrollTimesheetsEndpoint(Endpoint):
+    def __init__(self, requester, payroll_id):
+        self._url = '/api/v1/payrolls/%s/timesheets' % payroll_id
+        self._resource = Timesheet
+        self._resources = Timesheets
+        super(PayrollTimesheetsEndpoint, self).__init__(requester)
+
+    def list(self, page=PageParams.DEFAULT_PAGE, size=PageParams.DEFAULT_SIZE):
+        return self._list(page, size)
+
+    def get(self, id):
+        return self._get(id)
+
+
 class TimesheetsEndpoint(Endpoint):
     _url = '/api/v1/timesheets'
     _resources = Timesheets
@@ -256,10 +270,6 @@ class TimesheetsEndpoint(Endpoint):
 
     def create(self, timesheets):
         return self._create(timesheets)
-
-    def get_by_payroll_id(self, timesheet_id, payroll_id):
-        url = "%s/payrolls/%s" % (self._url, timesheet_id, payroll_id)
-        return self._get_url(url)
 
     def transactions(self, timesheet_id):
         TimesheetTransactionsEndpoint(self._requester, timesheet_id);
