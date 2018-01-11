@@ -47,7 +47,13 @@ class Client(object):
         return PayElementsEndpoint(self.requester())
 
     def payslips(self):
-        return PayslipsEndpoint(self.requester())
+        return self.payslips_by_current_payroll();
+
+    def payslips_by_current_payroll(self):
+        return self.payslips_by_payroll('current');
+
+    def payslips_by_payroll(self, payslipId):
+        return PayrollPayslipsEndpoint(self.requester(), payslipId)
 
     def timesheets(self):
         return TimesheetsEndpoint(self.requester())

@@ -219,27 +219,18 @@ class PayrollsEndpoint(Endpoint):
         return self.get('current')
 
 
-class PayslipsEndpoint(Endpoint):
-    def __init__(self, requester):
-        self._url = '/api/v1/payslips'
+class PayrollPayslipsEndpoint(Endpoint):
+    def __init__(self, requester, payroll_id):
+        self._url = '/api/v1/payrolls/%s/payslips' % payroll_id
         self._resource = Payslip
         self._resources = Payslips
-        super(PayslipsEndpoint, self).__init__(requester)
+        super(PayrollPayslipsEndpoint, self).__init__(requester)
 
     def list(self, page=PageParams.DEFAULT_PAGE, size=PageParams.DEFAULT_SIZE):
         return self._list(page, size)
 
-    def list_by_payroll(self, payroll_id, page=PageParams.DEFAULT_PAGE, size=PageParams.DEFAULT_SIZE):
-        url = "%s/%s" % (self._url, payroll_id)
-        return self._list(page, size, {}, url)
-
-    def get_by_employee_id(self, employee_id):
-        url = "%s/employees/%s" % (self._url, employee_id)
-        return self._get_url(url)
-
-    def get_by_payroll_and_by_employee_id(self, payroll_id, employee_id):
-        url = "%s/%s/employees/%s" % (self._url, payroll_id, employee_id)
-        return self._get_url(url)
+    def get(self, id):
+        return self._get(id)
 
 
 class TimesheetTransactionsEndpoint(Endpoint):

@@ -113,10 +113,12 @@ client.employee_leave_requests(employee_id)
 client.employee_payrates(employee_id)
 client.leave_requests()
 client.pay_elements()
-client.payslips()
+client.payslips_by_current_payroll()
+client.payslips_by_payroll()
 client.timesheets()
 client.timesheetsTransactions($timesheets_id)
 client.payrolls()
+
 
 ## Development
 wheel package need to be installed
